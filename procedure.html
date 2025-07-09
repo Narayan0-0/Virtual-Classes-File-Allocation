@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Theory - File Allocation Strategies</title>
+
+    <!-- Bootstrap 4.6 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            text-decoration: none;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            margin: 2rem auto;
+            max-width: 1400px;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 800px;
+            padding: 2rem 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin: 0.5rem 0;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0 25px 25px 0;
+            margin-right: 1rem;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu i {
+            margin-right: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .content-area {
+            padding: 3rem;
+            min-height: 800px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--accent-color);
+            display: inline-block;
+        }
+
+        .theory-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+            text-align: justify;
+        }
+
+        .theory-content h3 {
+            color: var(--primary-color);
+            margin: 2rem 0 1rem 0;
+            font-weight: 600;
+        }
+
+        .theory-content ul, .theory-content ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        .theory-content li {
+            margin: 0.5rem 0;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .image-container figcaption {
+            margin-top: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .breadcrumb-custom {
+            background: transparent;
+            padding: 0;
+            margin-bottom: 2rem;
+        }
+
+        .breadcrumb-custom .breadcrumb-item {
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb-custom .breadcrumb-item.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before {
+            content: "→";
+            color: var(--text-secondary);
+        }
+
+        .footer-custom {
+            background: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-custom h4 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .allocation-method {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .method-title {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .pros, .cons {
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .pros {
+            background: #f0fdf4;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .cons {
+            background: #fef2f2;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .pros h5, .cons h5 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .pros h5 {
+            color: var(--success-color);
+        }
+
+        .cons h5 {
+            color: var(--danger-color);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                border-radius: 15px;
+            }
+            
+            .content-area {
+                padding: 2rem 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .sidebar {
+                min-height: auto;
+            }
+
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-laptop-code me-2"></i>
+            Virtual Classes
+        </a>
+    </div>
+</nav>
+
+<!-- Main Container -->
+<div class="container-fluid" style="margin-top: 80px;">
+    <div class="main-container">
+        <div class="row no-gutters">
+            <!-- Sidebar -->
+            <div class="col-lg-3">
+                <div class="sidebar">
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="index.html">
+                                <i class="fas fa-bullseye"></i>
+                                <span>Aim</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="theory.html" class="active">
+                                <i class="fas fa-book"></i>
+                                <span>Theory</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="pretest.html">
+                                <i class="fas fa-clipboard-question"></i>
+                                <span>Pre Test</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="procedure.html">
+                                <i class="fas fa-list-ol"></i>
+                                <span>Procedure</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="simulation.html">
+                                <i class="fas fa-play-circle"></i>
+                                <span>Simulation</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="posttest.html">
+                                <i class="fas fa-clipboard-check"></i>
+                                <span>Post Test</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="references.html">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>References</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="col-lg-9">
+                <div class="content-area fade-in">
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-custom">
+                            <li class="breadcrumb-item">Operating System Lab</li>
+                            <li class="breadcrumb-item">File Allocation Strategies</li>
+                            <li class="breadcrumb-item active">Theory</li>
+                        </ol>
+                    </nav>
+
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <h1 class="page-title">File Allocation Strategies</h1>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="content-card">
+                        <h2 class="section-title"><i class="fas fa-book me-2"></i>Theory</h2>
+                        
+                        <div class="theory-content">
+                            <div class="highlight-box">
+                                <p><strong>File allocation strategies</strong> in operating systems are methods used to allocate space for files on storage devices such as hard disks. These strategies play a crucial role in managing storage efficiently and optimizing file access.</p>
+                            </div>
+
+                            <div class="image-container">
+                                <img src="/placeholder.svg?height=300&width=500" alt="File Allocation Overview">
+                                <figcaption>Fig. 1 File Allocation Overview</figcaption>
+                            </div>
+
+                            <h3>Key Terms and Concepts</h3>
+                            <ul>
+                                <li><strong>Seek Time:</strong> The time it takes for the read/write head of a disk drive to move to the track where the data to be read or written is located.</li>
+                                <li><strong>Disk Head:</strong> The component of a disk drive that reads and writes data to the disk platter. It is mounted on an arm that moves it across the disk surface.</li>
+                                <li><strong>Internal Fragmentation:</strong> Occurs when allocated memory may have some unused space due to the fixed size of memory allocation units.</li>
+                                <li><strong>External Fragmentation:</strong> Happens when free memory is scattered in small blocks across the storage, making it difficult to allocate contiguous blocks of memory.</li>
+                                <li><strong>Random Access:</strong> Allows data to be read or written in any order, making it very fast. Used for primary storage where speed is crucial.</li>
+                                <li><strong>Direct Access:</strong> Refers to the ability to access data directly without sequentially searching through other data.</li>
+                                <li><strong>File Control Block (FCB):</strong> A data structure used by file systems to store information about a file.</li>
+                                <li><strong>File Allocation Table (FAT):</strong> A legacy file system architecture used in various operating systems, including MS-DOS and Windows.</li>
+                            </ul>
+
+                            <div class="allocation-method">
+                                <h3 class="method-title">A. Contiguous File Allocation</h3>
+                                <p>Contiguous file allocation is a straightforward method where files are allocated consecutive blocks of disk space. It's one of the simplest techniques used in file systems.</p>
+                                
+                                <div class="image-container">
+                                    <img src="..\images\continous.jpg" alt="Contiguous Allocation">
+                                    <figcaption>Fig. 2 Contiguous File Allocation</figcaption>
+                                </div>
+
+                                <ul>
+                                    <li><strong>Purpose:</strong> Simplifies file access and management. Ideal for files that are accessed sequentially.</li>
+                                    <li><strong>Seek Time:</strong> Typically very low for sequential access since data blocks are stored consecutively.</li>
+                                </ul>
+
+                                <div class="pros-cons">
+                                    <div class="pros">
+                                        <h5><i class="fas fa-check-circle me-2"></i>Advantages</h5>
+                                        <ul>
+                                            <li>Very easy to implement</li>
+                                            <li>Minimum amount of seek time</li>
+                                            <li>Minimal disk head movement</li>
+                                            <li>Faster memory access</li>
+                                        </ul>
+                                    </div>
+                                    <div class="cons">
+                                        <h5><i class="fas fa-times-circle me-2"></i>Disadvantages</h5>
+                                        <ul>
+                                            <li>File size must be initialized at creation</li>
+                                            <li>Size cannot increase after initialization</li>
+                                            <li>Possible internal or external fragmentation</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <p><strong>Applications:</strong> Suitable for systems where file sizes are known in advance and do not change often, such as read-only media (e.g., CD-ROMs, DVD-ROMs). Effective in real-time systems where fast access time is critical.</p>
+                            </div>
+
+                            <div class="allocation-method">
+                                <h3 class="method-title">B. Indexed File Allocation</h3>
+                                <p>The indexed file allocation is similar to linked file allocation but uses an index block to store all pointers together, making retrieval easier and more efficient.</p>
+                                
+                                <div class="image-container">
+                                    <img src="..\images\index.jpg" alt="Indexed Allocation">
+                                    <figcaption>Fig. 3 Indexed File Allocation</figcaption>
+                                </div>
+
+                                <ul>
+                                    <li><strong>Purpose:</strong> Combines benefits of contiguous and linked allocation by using an index block to manage pointers.</li>
+                                    <li><strong>Seek Time:</strong> Moderate seek times as initial seek is needed to access the index block, followed by seeks to individual data blocks.</li>
+                                </ul>
+
+                                <div class="pros-cons">
+                                    <div class="pros">
+                                        <h5><i class="fas fa-check-circle me-2"></i>Advantages</h5>
+                                        <ul>
+                                            <li>Reduces possibilities of external fragmentation</li>
+                                            <li>Direct access to blocks rather than sequential</li>
+                                        </ul>
+                                    </div>
+                                    <div class="cons">
+                                        <h5><i class="fas fa-times-circle me-2"></i>Disadvantages</h5>
+                                        <ul>
+                                            <li>More pointer overhead</li>
+                                            <li>If index block is lost, entire file becomes inaccessible</li>
+                                            <li>Single index block may not accommodate all pointers for large files</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <p><strong>Applications:</strong> Suitable for systems requiring efficient random access to file blocks, such as database systems. Ideal for file systems where file sizes vary greatly and frequent updates occur.</p>
+                            </div>
+
+                            <div class="allocation-method">
+                                <h3 class="method-title">C. Linked File Allocation</h3>
+                                <p>The Linked file allocation overcomes the drawback of contiguous file allocation by storing files in a scattered manner with pointers linking the blocks together.</p>
+                                
+                                <div class="image-container">
+                                    <img src="..\images\linked.jpg" alt="Linked Allocation">
+                                    <figcaption>Fig. 4 Linked File Allocation</figcaption>
+                                </div>
+
+                                <ul>
+                                    <li><strong>Purpose:</strong> Allows files to grow dynamically without requiring contiguous disk space. Suitable for systems where file sizes vary and are modified frequently.</li>
+                                    <li><strong>Seek Time:</strong> Higher seek times for both sequential and random access due to the need to follow pointers from one block to the next.</li>
+                                </ul>
+
+                                <div class="pros-cons">
+                                    <div class="pros">
+                                        <h5><i class="fas fa-check-circle me-2"></i>Advantages</h5>
+                                        <ul>
+                                            <li>No external fragmentation</li>
+                                            <li>Directory entry needs only starting block address</li>
+                                            <li>More flexible than contiguous allocation</li>
+                                        </ul>
+                                    </div>
+                                    <div class="cons">
+                                        <h5><i class="fas fa-times-circle me-2"></i>Disadvantages</h5>
+                                        <ul>
+                                            <li>Does not support random or direct access</li>
+                                            <li>If pointers are corrupted, disk blocks are affected</li>
+                                            <li>Extra space required for pointers in each block</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <p><strong>Applications:</strong> Suitable for file systems with high flexibility requirements and where file sizes change frequently, such as general-purpose operating systems. Useful in systems where sequential access is more common than random access.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer-custom">
+    <div class="container">
+        <h4><i class="fas fa-code me-2"></i>Developed by Nar Narayan Gaur</h4>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Add active class to current page
+        var currentPage = window.location.pathname.split('/').pop();
+        $('.sidebar-menu a').removeClass('active');
+        $('.sidebar-menu a[href="' + currentPage + '"]').addClass('active');
+    });
+</script>
+</body>
+</html>

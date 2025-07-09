@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Pre Test - File Allocation Strategies</title>
+
+    <!-- Bootstrap 4.6 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            text-decoration: none;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            margin: 2rem auto;
+            max-width: 1400px;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 800px;
+            padding: 2rem 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin: 0.5rem 0;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0 25px 25px 0;
+            margin-right: 1rem;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu i {
+            margin-right: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .content-area {
+            padding: 3rem;
+            min-height: 800px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--accent-color);
+            display: inline-block;
+        }
+
+        .question {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            border-color: var(--primary-color);
+            background: #f0f9ff;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 1rem;
+            transform: scale(1.2);
+        }
+
+        .option.correct {
+            border-color: var(--success-color);
+            background: #f0fdf4;
+            color: var(--success-color);
+        }
+
+        .option.incorrect {
+            border-color: var(--danger-color);
+            background: #fef2f2;
+            color: var(--danger-color);
+        }
+
+        .result {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .result.correct {
+            background: #f0fdf4;
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .result.incorrect {
+            background: #fef2f2;
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .submit-btn {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .btn-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .final-result {
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 2rem;
+        }
+
+        .grade-excellent {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+        }
+
+        .grade-good {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+        }
+
+        .grade-needs-improvement {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+        }
+
+        .breadcrumb-custom {
+            background: transparent;
+            padding: 0;
+            margin-bottom: 2rem;
+        }
+
+        .breadcrumb-custom .breadcrumb-item {
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb-custom .breadcrumb-item.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before {
+            content: "→";
+            color: var(--text-secondary);
+        }
+
+        .footer-custom {
+            background: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-custom h4 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                border-radius: 15px;
+            }
+            
+            .content-area {
+                padding: 2rem 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .sidebar {
+                min-height: auto;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-laptop-code me-2"></i>
+            Virtual Classes
+        </a>
+    </div>
+</nav>
+
+<!-- Main Container -->
+<div class="container-fluid" style="margin-top: 80px;">
+    <div class="main-container">
+        <div class="row no-gutters">
+            <!-- Sidebar -->
+            <div class="col-lg-3">
+                <div class="sidebar">
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="index.html">
+                                <i class="fas fa-bullseye"></i>
+                                <span>Aim</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="theory.html">
+                                <i class="fas fa-book"></i>
+                                <span>Theory</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="pretest.html" class="active">
+                                <i class="fas fa-clipboard-question"></i>
+                                <span>Pre Test</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="procedure.html">
+                                <i class="fas fa-list-ol"></i>
+                                <span>Procedure</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="simulation.html">
+                                <i class="fas fa-play-circle"></i>
+                                <span>Simulation</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="posttest.html">
+                                <i class="fas fa-clipboard-check"></i>
+                                <span>Post Test</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="references.html">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>References</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="col-lg-9">
+                <div class="content-area fade-in">
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-custom">
+                            <li class="breadcrumb-item">Operating System Lab</li>
+                            <li class="breadcrumb-item">File Allocation Strategies</li>
+                            <li class="breadcrumb-item active">Pre Test</li>
+                        </ol>
+                    </nav>
+
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <h1 class="page-title">File Allocation Strategies</h1>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="content-card">
+                        <h2 class="section-title"><i class="fas fa-clipboard-question me-2"></i>Pre Test</h2>
+                        
+                        <div id="quiz">
+                            <!-- Question 1 -->
+                            <div class="question">
+                                <div class="question-text">
+                                    <strong>1. Which of the following is NOT a common file allocation strategy?</strong>
+                                </div>
+                                <div class="options">
+                                    <div class="option">
+                                        <input type="radio" name="q1" value="a" id="q1a">
+                                        <label for="q1a">Contiguous Allocation</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q1" value="b" id="q1b">
+                                        <label for="q1b">Linked Allocation</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q1" value="c" id="q1c">
+                                        <label for="q1c">Indexed Allocation</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q1" value="d" id="q1d">
+                                        <label for="q1d">Random Allocation</label>
+                                    </div>
+                                </div>
+                                <div id="result-1" class="result" style="display: none;"></div>
+                                <div id="explanation-1" class="explanation" style="display: none;">
+                                    <strong>Explanation:</strong> Random Allocation is not a recognized file allocation strategy. The three main file allocation strategies are Contiguous, Linked, and Indexed allocation. Each has specific methods for organizing file storage on disk.
+                                </div>
+                            </div>
+
+                            <!-- Question 2 -->
+                            <div class="question">
+                                <div class="question-text">
+                                    <strong>2. In the contiguous file allocation strategy, files are stored:</strong>
+                                </div>
+                                <div class="options">
+                                    <div class="option">
+                                        <input type="radio" name="q2" value="a" id="q2a">
+                                        <label for="q2a">In scattered blocks throughout the disk</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q2" value="b" id="q2b">
+                                        <label for="q2b">In a linked list of disk blocks</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q2" value="c" id="q2c">
+                                        <label for="q2c">In a series of contiguous disk blocks</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q2" value="d" id="q2d">
+                                        <label for="q2d">Using an index table of block addresses</label>
+                                    </div>
+                                </div>
+                                <div id="result-2" class="result" style="display: none;"></div>
+                                <div id="explanation-2" class="explanation" style="display: none;">
+                                    <strong>Explanation:</strong> Contiguous allocation stores files in consecutive disk blocks. This provides fast sequential access and minimal seek time, but can lead to external fragmentation and requires knowing file size in advance.
+                                </div>
+                            </div>
+
+                            <!-- Question 3 -->
+                            <div class="question">
+                                <div class="question-text">
+                                    <strong>3. In linked allocation, each file consists of:</strong>
+                                </div>
+                                <div class="options">
+                                    <div class="option">
+                                        <input type="radio" name="q3" value="a" id="q3a">
+                                        <label for="q3a">A contiguous set of blocks</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q3" value="b" id="q3b">
+                                        <label for="q3b">A linked list of disk blocks</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q3" value="c" id="q3c">
+                                        <label for="q3c">An indexed set of block pointers</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q3" value="d" id="q3d">
+                                        <label for="q3d">A single disk block</label>
+                                    </div>
+                                </div>
+                                <div id="result-3" class="result" style="display: none;"></div>
+                                <div id="explanation-3" class="explanation" style="display: none;">
+                                    <strong>Explanation:</strong> Linked allocation uses a linked list structure where each block contains a pointer to the next block. This eliminates external fragmentation but makes random access slower and requires extra space for pointers.
+                                </div>
+                            </div>
+
+                            <!-- Question 4 -->
+                            <div class="question">
+                                <div class="question-text">
+                                    <strong>4. Which file allocation strategy can suffer from external fragmentation?</strong>
+                                </div>
+                                <div class="options">
+                                    <div class="option">
+                                        <input type="radio" name="q4" value="a" id="q4a">
+                                        <label for="q4a">Contiguous Allocation</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q4" value="b" id="q4b">
+                                        <label for="q4b">Linked Allocation</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q4" value="c" id="q4c">
+                                        <label for="q4c">Indexed Allocation</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q4" value="d" id="q4d">
+                                        <label for="q4d">All of the above</label>
+                                    </div>
+                                </div>
+                                <div id="result-4" class="result" style="display: none;"></div>
+                                <div id="explanation-4" class="explanation" style="display: none;">
+                                    <strong>Explanation:</strong> Contiguous allocation suffers from external fragmentation because it requires consecutive free blocks. When files are deleted, gaps are created that may be too small for new files, leading to wasted space.
+                                </div>
+                            </div>
+
+                            <!-- Question 5 -->
+                            <div class="question">
+                                <div class="question-text">
+                                    <strong>5. Indexed allocation is especially advantageous for:</strong>
+                                </div>
+                                <div class="options">
+                                    <div class="option">
+                                        <input type="radio" name="q5" value="a" id="q5a">
+                                        <label for="q5a">Small files with frequent extensions</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q5" value="b" id="q5b">
+                                        <label for="q5b">Large files with random access requirements</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q5" value="c" id="q5c">
+                                        <label for="q5c">Large files with sequential access patterns</label>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="q5" value="d" id="q5d">
+                                        <label for="q5d">Small files stored contiguously</label>
+                                    </div>
+                                </div>
+                                <div id="result-5" class="result" style="display: none;"></div>
+                                <div id="explanation-5" class="explanation" style="display: none;">
+                                    <strong>Explanation:</strong> Indexed allocation is ideal for large files with random access requirements because the index block allows direct access to any block without traversing a linked list, making random access efficient.
+                                </div>
+                            </div>
+
+                            <div class="submit-btn">
+                                <button type="button" class="btn-custom" onclick="checkAnswers()">
+                                    <i class="fas fa-check me-2"></i>SUBMIT
+                                </button>
+                            </div>
+
+                            <div id="final-result" class="final-result" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer-custom">
+    <div class="container">
+        <h4><i class="fas fa-code me-2"></i>Developed by Nar Narayan Gaur</h4>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function checkAnswers() {
+        var answers = ['d', 'c', 'b', 'a', 'b'];
+        var totalQuestions = 5;
+        var correctAnswers = 0;
+
+        // Reset all option styles
+        $('.option').removeClass('correct incorrect');
+
+        for (var i = 1; i <= totalQuestions; i++) {
+            var selectedOption = $('input[name=q' + i + ']:checked');
+            var resultElement = $('#result-' + i);
+            var explanationElement = $('#explanation-' + i);
+            var questionOptions = $('input[name=q' + i + ']').parent();
+
+            if (selectedOption.length > 0) {
+                var selectedAnswer = selectedOption.val();
+                var selectedOptionDiv = selectedOption.parent();
+
+                if (selectedAnswer === answers[i - 1]) {
+                    selectedOptionDiv.addClass('correct');
+                    resultElement.removeClass('incorrect').addClass('correct');
+                    resultElement.html('<i class="fas fa-check-circle me-2"></i>Correct!');
+                    correctAnswers++;
+                } else {
+                    selectedOptionDiv.addClass('incorrect');
+                    resultElement.removeClass('correct').addClass('incorrect');
+                    resultElement.html('<i class="fas fa-times-circle me-2"></i>Wrong!');
+                }
+            } else {
+                resultElement.removeClass('correct').addClass('incorrect');
+                resultElement.html('<i class="fas fa-exclamation-circle me-2"></i>No answer selected!');
+            }
+            
+            resultElement.show();
+            explanationElement.show();
+        }
+
+        var finalResult = $('#final-result');
+        var percentage = Math.round((correctAnswers / totalQuestions) * 100);
+        var gradeClass = '';
+        var gradeText = '';
+
+        if (percentage >= 80) {
+            gradeClass = 'grade-excellent';
+            gradeText = 'Excellent!';
+        } else if (percentage >= 60) {
+            gradeClass = 'grade-good';
+            gradeText = 'Good!';
+        } else {
+            gradeClass = 'grade-needs-improvement';
+            gradeText = 'Needs Improvement';
+        }
+
+        finalResult.removeClass('grade-excellent grade-good grade-needs-improvement').addClass(gradeClass);
+        finalResult.html(`
+            <i class="fas fa-chart-bar me-2"></i>
+            ${gradeText} You scored ${correctAnswers} out of ${totalQuestions} questions (${percentage}%)
+        `);
+        finalResult.show();
+
+        // Scroll to results
+        $('html, body').animate({
+            scrollTop: finalResult.offset().
