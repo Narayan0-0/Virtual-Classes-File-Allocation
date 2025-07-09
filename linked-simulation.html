@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linked Allocation Simulation - Virtual Classes</title>
+    
+    <!-- Bootstrap 4.6 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- GoJS -->
+    <script src="https://unpkg.com/gojs@2.3.13/release/go.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            text-decoration: none;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            margin: 2rem auto;
+            max-width: 1600px;
+            overflow: hidden;
+            min-height: 900px;
+        }
+
+        .simulation-header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .simulation-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .simulation-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .simulation-content {
+            display: flex;
+            height: calc(100vh - 200px);
+            min-height: 700px;
+        }
+
+        .control-panel {
+            width: 400px;
+            background: #f8fafc;
+            border-right: 1px solid var(--border-color);
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .control-section h3 {
+            color: #10b981;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .control-section h3 i {
+            margin-right: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-custom {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            color: white;
+        }
+
+        .btn-custom:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+        }
+
+        .simulation-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+        }
+
+        .memory-section {
+            flex: 1;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .memory-title {
+            color: #10b981;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .memory-title i {
+            margin-right: 0.5rem;
+        }
+
+        #myDiagramDiv {
+            width: 100%;
+            height: 400px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+        }
+
+        .directory-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .directory-title {
+            color: #10b981;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .directory-title i {
+            margin-right: 0.5rem;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            background: #10b981;
+            color: white;
+            border: none;
+            font-weight: 600;
+            text-align: center;
+            padding: 1rem 0.75rem;
+        }
+
+        .table td {
+            text-align: center;
+            padding: 0.75rem;
+            border-color: var(--border-color);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .instructions-btn {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .instructions-btn:hover {
+            transform: scale(1.1);
+            background: #059669;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            border: none;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .close {
+            color: white;
+            opacity: 1;
+        }
+
+        .close:hover {
+            color: #f1f5f9;
+        }
+
+        .alert-custom {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #dcfdf7, #a7f3d0);
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer-custom {
+            background: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .footer-custom h5 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .link-visualization {
+            position: relative;
+        }
+
+        .link-arrow {
+            stroke: #10b981;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+
+        @media (max-width: 768px) {
+            .simulation-content {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .control-panel {
+                width: 100%;
+            }
+            
+            .main-container {
+                margin: 1rem;
+                border-radius: 15px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Alert Styles */
+        .swal2-popup {
+            border-radius: 15px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .swal2-title {
+            color: #10b981;
+        }
+
+        .swal2-confirm {
+            background: #10b981 !important;
+            border-radius: 8px;
+        }
+
+        .swal2-cancel {
+            background: var(--text-secondary) !important;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="simulation.html">
+                <i class="fas fa-laptop-code me-2"></i>
+                Virtual Classes
+            </a>
+        </div>
+    </nav>
+
+    <!-- Back Button -->
+    <a href="simulation.html" class="back-btn">
+        <i class="fas fa-arrow-left me-2"></i>Back to Simulations
+    </a>
+
+    <!-- Instructions Button -->
+    <button class="instructions-btn" data-toggle="modal" data-target="#instructionsModal">
+        <i class="fas fa-question"></i>
+    </button>
+
+    <!-- Main Container -->
+    <div class="main-container fade-in" style="margin-top: 80px;">
+        <!-- Header -->
+        <div class="simulation-header">
+            <h1 class="simulation-title">
+                <i class="fas fa-link me-2"></i>
+                Linked File Allocation
+            </h1>
+            <p class="simulation-subtitle">
+                Interactive simulation of linked file allocation strategy with pointer visualization
+            </p>
+        </div>
+
+        <!-- Simulation Content -->
+        <div class="simulation-content">
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <!-- File Allocation Section -->
+                <div class="control-section">
+                    <h3><i class="fas fa-plus-circle"></i>Allocate File</h3>
+                    
+                    <div class="form-group">
+                        <label for="fileName">File Name:</label>
+                        <input type="text" id="fileName" class="form-control" placeholder="Enter file name" pattern="[a-zA-Z0-9]*">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fileType">File Type:</label>
+                        <select id="fileType" class="form-control">
+                            <option value="">Select type</option>
+                            <option value=".doc">.doc</option>
+                            <option value=".pdf">.pdf</option>
+                            <option value=".png">.png</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fileSize">File Size (MB):</label>
+                        <input type="number" id="fileSize" class="form-control" placeholder="Enter size" min="1">
+                    </div>
+                    
+                    <button id="submitBtn" class="btn-custom" onclick="submit()">
+                        <i class="fas fa-plus me-2"></i>ALLOCATE FILE
+                    </button>
+                </div>
+
+                <!-- File Deallocation Section -->
+                <div class="divider">
+                    <span>DEALLOCATE</span>
+                </div>
+
+                <div class="control-section">
+                    <h3><i class="fas fa-minus-circle"></i>Deallocate File</h3>
+                    
+                    <div class="form-group">
+                        <label for="deleteFileName">File Name:</label>
+                        <input type="text" id="deleteFileName" class="form-control" placeholder="Enter file name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deleteFileType">File Type:</label>
+                        <select id="deleteFileType" class="form-control">
+                            <option value="">Select type</option>
+                            <option value=".doc">.doc</option>
+                            <option value=".pdf">.pdf</option>
+                            <option value=".png">.png</option>
+                        </select>
+                    </div>
+                    
+                    <button id="deallocateBtn" class="btn-custom btn-danger" onclick="deallocate()">
+                        <i class="fas fa-trash me-2"></i>DELETE FILE
+                    </button>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="control-section">
+                    <h3><i class="fas fa-cogs"></i>Controls</h3>
+                    
+                    <button class="btn-custom btn-warning" onclick="window.location.reload()">
+                        <i class="fas fa-redo me-2"></i>RESET
+                    </button>
+                    
+                    <button id="printBtn" class="btn-custom" onclick="window.print()" disabled>
+                        <i class="fas fa-print me-2"></i>PRINT
+                    </button>
+                </div>
+
+                <!-- Info Section -->
+                <div class="alert-custom alert-info">
+                    <strong><i class="fas fa-info-circle me-2"></i>Note:</strong>
+                    Each block is 20 MB in size. Files are linked using pointers. Hover over blocks to see details.
+                </div>
+            </div>
+
+            <!-- Simulation Area -->
+            <div class="simulation-area">
+                <!-- Memory Visualization -->
+                <div class="memory-section">
+                    <h3 class="memory-title">
+                        <i class="fas fa-hdd"></i>Hard Disk Memory with Link Pointers
+                    </h3>
+                    <div id="myDiagramDiv"></div>
+                </div>
+
+                <!-- Directory Table -->
+                <div class="directory-section">
+                    <h3 class="directory-title">
+                        <i class="fas fa-folder-open"></i>File Directory
+                    </h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="processTable">
+                            <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>File Type</th>
+                                    <th>File Size</th>
+                                    <th>Start Block</th>
+                                    <th>End Block</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div class="modal fade" id="instructionsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-info-circle me-2"></i>Instructions
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ol class="list-group list-group-flush">
+                        <li class="list-group-item">Create a file by entering the file name, type and size (MB).</li>
+                        <li class="list-group-item">Click the <strong>ALLOCATE FILE</strong> button to allocate blocks to the file on the hard disk.
+                            <ul class="mt-2">
+                                <li>If enough memory is available, observe how blocks are allocated and linked with pointers.</li>
+                            </ul>
+                        </li>
+                        <li class="list-group-item">Repeat steps 1 through 2 until the memory is full.</li>
+                        <li class="list-group-item">To deallocate a file, enter the file name, select the file type, and then click the <strong>DELETE FILE</strong> button.
+                            <ul class="mt-2">
+                                <li>Observe how the linked blocks are deallocated and pointers are removed.</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    <div class="alert alert-info mt-3">
+                        <strong>Note 1:</strong> To see the block details, just move your mouse over the block.<br>
+                        <strong>Note 2:</strong> Each block contains a pointer to the next block in the file.<br>
+                        <strong>Note 3:</strong> Here, each block is of 20 MB in size.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="container">
+            <h5><i class="fas fa-code me-2"></i>Developed by Nar Narayan Gaur</h5>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // Global variables
+        let myDiagram;
+        let allocatedBlocks = [];
+        let allocatedBlocksMap = {};
+        let fileColors = {};
+        let numBlocksValue = 15;
+        let blockSizeValue = 20;
+
+        // Initialize the simulation
+        $(document).ready(function() {
+            init(numBlocksValue);
+            showWelcomeMessage();
+            // Pre-allocate some files for demonstration
+            setTimeout(() => {
+                randomAllocateBlock();
+            }, 1000);
+        });
+
+        function showWelcomeMessage() {
+            Swal.fire({
+                title: 'Welcome to Linked Allocation!',
+                html: 'Currently, memory is assigned to two files, leaving other blocks unused. Create new files to see how linked allocation works!',
+                icon: 'info',
+                confirmButtonText: 'Get Started',
+                confirmButtonColor: '#10b981'
+            });
+        }
+
+        function init(numBlocks) {
+            const $ = go.GraphObject.make;
+
+            myDiagram = $(go.Diagram, "myDiagramDiv", {
+                "panningTool.isEnabled": false,
+                "undoManager.isEnabled": true,
+                initialContentAlignment: go.Spot.Center,
+                "toolManager.hoverDelay": 100,
+                "toolManager.mouseWheelBehavior": go.ToolManager.None,
+            });
+
+            // Prevent deletion
+            myDiagram.commandHandler.deleteSelection = function() {
+                return;
+            };
+
+            // Define the block template
+            myDiagram.nodeTemplateMap.add("Block",
+                $(go.Node, "Auto", {
+                    movable: false,
+                    selectable: false
+                },
+                $(go.Shape, "RoundedRectangle", {
+                    name: "SHAPE",
+                    fill: "white",
+                    strokeWidth: 1,
+                    width: 40,
+                    height: 30
+                }),
+                $(go.TextBlock, {
+                    margin: 4,
+                    editable: false,
+                    font: "12px Inter"
+                }, new go.Binding("text", "name").makeTwoWay()),
+                {
+                    toolTip: $(go.Adornment, "Auto")
+                        .add(new go.Shape("RoundedRectangle", {
+                            minWidth: 50,
+                            maxWidth: 200,
+                            minHeight: 20,
+                            maxHeight: 60,
+                            fill: "white"
+                        }).bind("fill", "color"))
+                        .add($(go.TextBlock, { margin: 4 }, new go.Binding("text", "tooltip")))
+                }
+                ));
+
+            // Create the model
+            myDiagram.model = new go.GraphLinksModel([
+                { key: 0, name: "HARD DISK", isGroup: true, isMovable: false, isLayoutPositioned: false }
+            ]);
+
+            // Add blocks
+            for (let i = 0; i < numBlocks; i++) {
+                myDiagram.model.addNodeData({
+                    key: i + 1,
+                    name: "b" + i,
+                    tooltip: "Empty block",
+                    group: 0,
+                    category: "Block",
+                    color: 'white'
+                });
+            }
+
+            // Group template
+            myDiagram.groupTemplate = $(go.Group, "Vertical", {
+                layout: $(go.GridLayout, {
+                    wrappingColumn: 5,
+                    alignment: go.GridLayout.Position,
+                    spacing: new go.Size(30, 35)
+                }),
+                movable: false,
+                selectable: false,
+                copyable: false,
+                locationSpot: go.Spot.TopLeft,
+                location: new go.Point(0, 0),
+                isLayoutPositioned: false
+            },
+            new go.Binding("movable", "isMovable"),
+            $(go.Panel, "Auto",
+                $(go.Shape, "DiskStorage", {
+                    fill: "white",
+                    strokeWidth: 1,
+                    height: 350,
+                    width: 430
+                }),
+                $(go.Placeholder, { padding: new go.Margin(20, 0, 0, 0) })
+            ),
+            $(go.TextBlock, {
+                alignment: go.Spot.Center,
+                font: "bold 16px Inter",
+                margin: 8
+            }, new go.Binding("text", "name")));
+
+            // Link template for showing pointers
+            myDiagram.linkTemplateMap.add("AllocatedLink",
+                $(go.Link, {
+                    routing: go.Link.Normal,
+                    curve: go.Curve.JumpGap,
+                    corner: 10,
+                    relinkableFrom: true,
+                    relinkableTo: true,
+                    reshapable: true,
+                    movable: false,
+                    selectable: false,
+                    zOrder: 5,
+                    layerName: "backlayer",
+                    isLayoutPositioned: false
+                },
+                $(go.Shape, { stroke: "#10b981", strokeWidth: 2 }, new go.Binding("stroke", "color")),
+                $(go.Shape, { toArrow: "Standard", stroke: "#10b981", fill: "#10b981" }, new go.Binding("stroke", "color"))
+                ));
+
+            myDiagram.animationManager.initialAnimationStyle = go.AnimationStyle.None;
+            myDiagram.model = go.Model.fromJson(myDiagram.model.toJson());
+        }
+
+        function randomAllocateBlock() {
+            // Pre-allocate two demo files
+            const randomBlocks1 = [1, 3, 5]; // Main.doc
+            const randomBlocks2 = [7, 9, 11]; // pic.png
+            
+            allocateRandomFile(randomBlocks1, 'Main', '.doc', 55);
+            allocateRandomFile(randomBlocks2, 'pic', '.png', 48);
+        }
+
+        function allocateRandomFile(blocks, name, type, size) {
+            const fileColor = getRandomColor();
+            fileColors[name] = fileColor;
+            
+            blocks.forEach((blockIndex, index) => {
+                allocatedBlocks.push(blockIndex - 1);
+                allocatedBlocksMap[blockIndex - 1] = true;
+                
+                const node = myDiagram.findNodeForKey(blockIndex);
+                if (node) {
+                    node.findObject("SHAPE").fill = fileColor;
+                    node.data.color = lightenHexColor(fileColor, 0.5);
+                    
+                    if (index < blocks.length - 1) {
+                        const nextBlock = blocks[index + 1];
+                        node.data.tooltip = `File: ${name}${type}\nFile Size: ${size} MB\nNext Block Pointer: b${nextBlock - 1}`;
+                        
+                        // Create link to next block
+                        const linkData = {
+                            from: node.key,
+                            to: nextBlock,
+                            category: "AllocatedLink",
+                            fromSpot: go.Spot.TopSide,
+                            toSpot: go.Spot.BottomSide,
+                            zOrder: 10,
+                            isLayoutPositioned: false,
+                            color: fileColor,
+                            movable: false
+                        };
+                        myDiagram.model.addLinkData(linkData);
+                    } else {
+                        const internalFragmentation = 60 - size;
+                        node.data.tooltip = `File: ${name}${type}\nFile Size: ${size} MB\nInternal Fragmentation: ${internalFragmentation} MB\nNext Block Pointer: -1`;
+                    }
+                }
+            });
+
+            // Update directory table
+            updateDirectoryTable(name, type, size, `b${blocks[0] - 1}`, `b${blocks[blocks.length - 1] - 1}`, 'Allocated');
+        }
+
+        function submit() {
+            const fileName = document.getElementById("fileName").value;
+            const fileType = document.getElementById("fileType").value;
+            const fileSize = parseInt(document.getElementById("fileSize").value);
+
+            // Validation
+            if (!fileName || !fileType || !fileSize) {
+                Swal.fire({
+                    title: 'Missing Values!',
+                    text: 'Please fill in all fields before submitting.',
+                    icon: 'warning',
+                    confirmButtonColor: '#10b981'
+                });
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9]+$/.test(fileName)) {
+                Swal.fire({
+                    title: 'Invalid File Name!',
+                    text: 'File name must be alphanumeric.',
+                    icon: 'error',
+                    confirmButtonColor: '#10b981'
+                });
+                return;
+            }
+
+            if (fileSize <= 0) {
+                Swal.fire({
+                    title: 'Invalid File Size!',
+                    text: 'File size must be greater than zero.',
+                    icon: 'error',
+                    confirmButtonColor: '#10b981'
+                });
+                return;
+            }
+
+            // Check if file already exists
+            const existingFiles = getExistingFiles();
+            if (existingFiles.includes(fileName + fileType)) {
+                Swal.fire({
+                    title: 'File Already Exists!',
+                    text: 'A file with the same name already exists.',
+                    icon: 'error',
+                    confirmButtonColor: '#10b981'
+                });
+                return;
+            }
+
+            const requiredBlocks = Math.ceil(fileSize / blockSizeValue);
+            const freeBlocks = getFreeBlocks();
+            
+            if (freeBlocks.length < requiredBlocks) {
+                Swal.fire({
+                    title: 'Insufficient Memory!',
+                    text: 'Not enough free blocks available.',
+                    icon: 'error',
+                    confirmButtonColor: '#10b981'
+                });
+                return;
+            }
+
+            // Allocate random blocks (linked allocation doesn't need contiguous blocks)
+            const allocatedBlocksForFile = [];
+            for (let i = 0; i < requiredBlocks; i++) {
+                const randomIndex = Math.floor(Math.random() * freeBlocks.length);
+                const block = freeBlocks[randomIndex];
+                allocatedBlocksForFile.push(block);
+                freeBlocks.splice(randomIndex, 1);
+            }
+
+            allocateFile(fileName, fileType, fileSize, allocatedBlocksForFile);
+            clearForm();
+            
+            Swal.fire({
+                title: 'File Allocated!',
+                text: `File ${fileName}${fileType} has been successfully allocated using linked allocation.`,
+                icon: 'success',
+                confirmButtonColor: '#10b981'
+            });
+
+            // Check if memory is full
+            if (allocatedBlocks.length >= numBlocksValue) {
+                disableAllocation();
+                document.getElementById("printBtn").disabled = false;
+                
+                Swal.fire({
+                    title: 'Memory Full!',
+                    text: 'No additional files can be allocated.',
+                    icon: 'info',
+                    confirmButtonColor: '#10b981'
+                });
+            }
+        }
+
+        function allocateFile(fileName, fileType, fileSize, blocks) {
+            const fileColor = getRandomColor();
+            fileColors[fileName] = fileColor;
+            const requiredBlocks = Math.ceil(fileSize / blockSizeValue);
+
+            blocks.forEach((blockIndex, index) => {
+                allocatedBlocks.push(blockIndex);
+                allocatedBlocksMap[blockIndex] = true;
+                
+                const node = myDiagram.findNodeForKey(blockIndex + 1);
+                if (node) {
+                    node.findObject("SHAPE").fill = fileColor;
+                    node.data.color = lightenHexColor(fileColor, 0.5);
+                    
+                    if (index < blocks.length - 1) {
+                        const nextBlock = blocks[index + 1];
+                        node.data.tooltip = `File: ${fileName}${fileType}\nFile Size: ${fileSize} MB\nNext Block Pointer: b${nextBlock}`;
+                        
+                        // Create link to next block
+                        const linkData = {
+                            from: node.key,
+                            to: nextBlock + 1,
+                            category: "AllocatedLink",
+                            fromSpot: go.Spot.TopSide,
+                            toSpot: go.Spot.BottomSide,
+                            zOrder: 10,
+                            isLayoutPositioned: false,
+                            color: fileColor,
+                            movable: false
+                        };
+                        myDiagram.model.addLinkData(linkData);
+                    } else {
+                        const internalFragmentation = (requiredBlocks * blockSizeValue) - fileSize;
+                        node.data.tooltip = `File: ${fileName}${fileType}\nFile Size: ${fileSize} MB\nInternal Fragmentation: ${internalFragmentation} MB\nNext Block Pointer: -1`;
+                    }
+                }
+            });
+
+            // Update directory table
+            updateDirectoryTable(fileName, fileType, fileSize, `b${blocks[0]}`, `b${blocks[blocks.length - 1]}`, 'Allocated');
+        }
+
+        function deallocate() {
+            const fileName = document.getElementById("deleteFileName").value;
+            const fileType = document.getElementById("deleteFileType").value;
+
+            if (!fileName || !fileType) {
+                Swal.fire({
+                    title: 'Missing Values!',
+                    text: 'Please fill in all fields before deleting.',
+                    icon: 'warning',
+                    confirmButtonColor: '#10b981'
+                });
+                return;
+            }
+
+            const existingFiles = getExistingFiles();
+            if (!existingFiles.includes(fileName + fileType)) {
+                Swal.fire({
+                    title: 'File Not Found!',
+                    text: `File ${fileName}${fileType} does not exist.`,
+                    icon: 'error',
+                    confirmButtonColor: '#10b981'
+                });
+                return;
+            }
+
+            // Find and deallocate file
+            const tableBody = document.getElementById("processTable").getElementsByTagName("tbody")[0];
+            const rows = tableBody.rows;
+            
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName("td");
+                if (cells[0].innerText === fileName && cells[1].innerText === fileType) {
+                    if (cells[5].innerText === 'Not Allocated') {
+                        Swal.fire({
+                            title: 'No Memory Deallocated!',
+                            text: 'No memory was allocated for this file.',
+                            icon: 'error',
+                            confirmButtonColor: '#10b981'
+                        });
+                        return;
+                    }
+                    
+                    const startBlock = cells[3].innerText;
+                    const fileSize = parseInt(cells[2].innerText.replace(' MB', ''));
+                    const requiredBlocks = Math.ceil(fileSize / blockSizeValue);
+                    
+                    deallocateLinkedFile(fileName);
+                    tableBody.deleteRow(i);
+                    break;
+                }
+            }
+
+            clearDeallocateForm();
+            enableAllocation();
+            
+            Swal.fire({
+                title: 'File Deallocated!',
+                text: `File ${fileName}${fileType} has been successfully deallocated.`,
+                icon: 'success',
+                confirmButtonColor: '#10b981'
+            });
+        }
+
+        function deallocateLinkedFile(fileName) {
+            const blocksToRemove = [];
+            
+            // Find all blocks belonging to this file
+            myDiagram.nodes.each(function(node) {
+                if (node.category === "Block" && node.data.tooltip && node.data.tooltip.includes(`File: ${fileName}`)) {
+                    blocksToRemove.push(node.key - 1);
+                }
+            });
+
+            // Remove blocks and links
+            blocksToRemove.forEach(blockIndex => {
+                const node = myDiagram.findNodeForKey(blockIndex + 1);
+                if (node) {
+                    node.findObject("SHAPE").fill = 'white';
+                    node.data.tooltip = 'Empty block';
+                    node.data.color = 'white';
+                    
+                    // Remove all links connected to this node
+                    const linksConnected = node.findLinksConnected();
+                    linksConnected.each(function(link) {
+                        if (link && link.data) {
+                            myDiagram.model.removeLinkData(link.data);
+                        }
+                    });
+                }
+                
+                const index = allocatedBlocks.indexOf(blockIndex);
+                if (index > -1) {
+                    allocatedBlocks.splice(index, 1);
+                }
+                allocatedBlocksMap[blockIndex] = false;
+            });
+        }
+
+        function getFreeBlocks() {
+            const freeBlocks = [];
+            for (let i = 0; i < numBlocksValue; i++) {
+                if (!allocatedBlocksMap[i]) {
+                    freeBlocks.push(i);
+                }
+            }
+            return freeBlocks;
+        }
+
+        function updateDirectoryTable(fileName, fileType, fileSize, startBlock, endBlock, status) {
+            const tableBody = document.getElementById("processTable").getElementsByTagName("tbody")[0];
+            const newRow = tableBody.insertRow();
+            
+            newRow.insertCell(0).innerHTML = fileName;
+            newRow.insertCell(1).innerHTML = fileType;
+            newRow.insertCell(2).innerHTML = fileSize + ' MB';
+            newRow.insertCell(3).innerHTML = startBlock;
+            newRow.insertCell(4).innerHTML = endBlock;
+            newRow.insertCell(5).innerHTML = status;
+        }
+
+        function getExistingFiles() {
+            const existingFiles = [];
+            const tableBody = document.getElementById("processTable").getElementsByTagName("tbody")[0];
+            const rows = tableBody.rows;
+            
+            for (let i = 0; i < rows.length; i++) {
+                existingFiles.push(rows[i].cells[0].innerHTML + rows[i].cells[1].innerHTML);
+            }
+            
+            return existingFiles;
+        }
+
+        function clearForm() {
+            document.getElementById("fileName").value = "";
+            document.getElementById("fileType").value = "";
+            document.getElementById("fileSize").value = "";
+        }
+
+        function clearDeallocateForm() {
+            document.getElementById("deleteFileName").value = "";
+            document.getElementById("deleteFileType").value = "";
+        }
+
+        function enableAllocation() {
+            document.getElementById("fileName").readOnly = false;
+            document.getElementById("fileType").disabled = false;
+            document.getElementById("fileSize").readOnly = false;
+            document.getElementById("submitBtn").disabled = false;
+        }
+
+        function disableAllocation() {
+            document.getElementById("fileName").readOnly = true;
+            document.getElementById("fileType").disabled = true;
+            document.getElementById("fileSize").readOnly = true;
+            document.getElementById("submitBtn").disabled = true;
+        }
+
+        function getRandomColor() {
+            const r = Math.floor(Math.random() * 128) + 128;
+            const g = Math.floor(Math.random() * 128) + 128;
+            const b = Math.floor(Math.random() * 128) + 128;
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+
+        function hexToRgb(hex) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return { r, g, b };
+        }
+
+        function lightenColor(rgb, factor = 0.2) {
+            const r = Math.min(255, Math.floor(rgb.r + (255 - rgb.r) * factor));
+            const g = Math.min(255, Math.floor(rgb.g + (255 - rgb.g) * factor));
+            const b = Math.min(255, Math.floor(rgb.b + (255 - rgb.b) * factor));
+            return { r, g, b };
+        }
+
+        function rgbToHex(rgb) {
+            return `#${((1 << 24) + (rgb.r << 16) + (rgb.g << 8) + rgb.b).toString(16).slice(1).toUpperCase()}`;
+        }
+
+        function lightenHexColor(hex, factor = 0.2) {
+            const rgb = hexToRgb(hex);
+            const lightenedRgb = lightenColor(rgb, factor);
+            return rgbToHex(lightenedRgb);
+        }
+    </script>
+</body>
+</html>
