@@ -4,15 +4,15 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Pre Test - File Allocation Strategies</title>
-
+    <title>References - Deadlock Detection Algorithm</title>
+    
     <!-- Bootstrap 4.6 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+    
     <style>
         :root {
             --primary-color: #2563eb;
@@ -71,7 +71,7 @@
 
         .sidebar {
             background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            min-height: 800px;
+            min-height: 600px;
             padding: 2rem 0;
         }
 
@@ -111,7 +111,7 @@
 
         .content-area {
             padding: 3rem;
-            min-height: 800px;
+            min-height: 600px;
         }
 
         .page-header {
@@ -147,134 +147,44 @@
             display: inline-block;
         }
 
-        .question {
-            background: #f8fafc;
+        .reference-item {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
             border-radius: 10px;
             padding: 1.5rem;
-            margin-bottom: 2rem;
+            margin: 1rem 0;
             border-left: 4px solid var(--primary-color);
-        }
-
-        .question-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-        }
-
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-
-        .option {
-            display: flex;
-            align-items: center;
-            padding: 0.8rem;
-            background: white;
-            border-radius: 8px;
-            border: 2px solid var(--border-color);
-            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .option:hover {
-            border-color: var(--primary-color);
-            background: #f0f9ff;
-        }
-
-        .option input[type="radio"] {
-            margin-right: 1rem;
-            transform: scale(1.2);
-        }
-
-        .option.correct {
-            border-color: var(--success-color);
-            background: #f0fdf4;
-            color: var(--success-color);
-        }
-
-        .option.incorrect {
-            border-color: var(--danger-color);
-            background: #fef2f2;
-            color: var(--danger-color);
-        }
-
-        .result {
-            margin-top: 1rem;
-            padding: 0.8rem;
-            border-radius: 8px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .result.correct {
-            background: #f0fdf4;
-            color: var(--success-color);
-            border: 1px solid var(--success-color);
-        }
-
-        .result.incorrect {
-            background: #fef2f2;
-            color: var(--danger-color);
-            border: 1px solid var(--danger-color);
-        }
-
-        .explanation {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-radius: 8px;
-            border-left: 4px solid var(--primary-color);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        .submit-btn {
-            text-align: center;
-            margin: 2rem 0;
-        }
-
-        .btn-custom {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .reference-item:hover {
+            transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
 
-        .btn-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .final-result {
-            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+        .reference-number {
+            background: var(--primary-color);
             color: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 1.2rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 600;
-            margin-top: 2rem;
+            margin-right: 1rem;
+            font-size: 0.9rem;
         }
 
-        .grade-excellent {
-            background: linear-gradient(135deg, var(--success-color), #059669);
+        .reference-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+            text-align: justify;
         }
 
-        .grade-good {
-            background: linear-gradient(135deg, var(--warning-color), #d97706);
-        }
-
-        .grade-needs-improvement {
-            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+        .reference-text em {
+            color: var(--primary-color);
+            font-style: italic;
         }
 
         .breadcrumb-custom {
@@ -310,6 +220,14 @@
             font-weight: 500;
         }
 
+        .info-box {
+            background: linear-gradient(135deg, #e0f2fe, #b3e5fc);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
         @media (max-width: 768px) {
             .main-container {
                 margin: 1rem;
@@ -341,336 +259,169 @@
 </head>
 
 <body>
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
-    <div class="container">
-        <a class="navbar-brand" href="#">
-            <i class="fas fa-laptop-code me-2"></i>
-            Virtual Classes
-        </a>
-    </div>
-</nav>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-laptop-code me-2"></i>
+                Virtual Classes
+            </a>
+        </div>
+    </nav>
 
-<!-- Main Container -->
-<div class="container-fluid" style="margin-top: 80px;">
-    <div class="main-container">
-        <div class="row no-gutters">
-            <!-- Sidebar -->
-            <div class="col-lg-3">
-                <div class="sidebar">
-                    <ul class="sidebar-menu">
-                        <li>
-                            <a href="index.html">
-                                <i class="fas fa-bullseye"></i>
-                                <span>Aim</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="theory.html">
-                                <i class="fas fa-book"></i>
-                                <span>Theory</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="pretest.html" class="active">
-                                <i class="fas fa-clipboard-check"></i>
-                                <span>Pre Test</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="procedure.html">
-                                <i class="fas fa-list-ol"></i>
-                                <span>Procedure</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="simulation.html">
-                                <i class="fas fa-play-circle"></i>
-                                <span>Simulation</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="posttest.html">
-                                <i class="fas fa-clipboard-check"></i>
-                                <span>Post Test</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="references.html">
-                                <i class="fas fa-external-link-alt"></i>
-                                <span>References</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Content Area -->
-            <div class="col-lg-9">
-                <div class="content-area fade-in">
-                    <!-- Breadcrumb -->
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb breadcrumb-custom">
-                            <li class="breadcrumb-item">Operating System Lab</li>
-                            <li class="breadcrumb-item">File Allocation Strategies</li>
-                            <li class="breadcrumb-item active">Pre Test</li>
-                        </ol>
-                    </nav>
-
-                    <!-- Page Header -->
-                    <div class="page-header">
-                        <h1 class="page-title">File Allocation Strategies</h1>
+    <!-- Main Container -->
+    <div class="container-fluid" style="margin-top: 80px;">
+        <div class="main-container">
+            <div class="row no-gutters">
+                <!-- Sidebar -->
+                <div class="col-lg-3">
+                    <div class="sidebar">
+                        <ul class="sidebar-menu">
+                            <li>
+                                <a href="index.html">
+                                    <i class="fas fa-bullseye"></i>
+                                    <span>Aim</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="theory.html">
+                                    <i class="fas fa-book"></i>
+                                    <span>Theory</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="pretest.html">
+                                    <i class="fas fa-clipboard-check"></i>
+                                    <span>Pre Test</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="procedure.html">
+                                    <i class="fas fa-list-ol"></i>
+                                    <span>Procedure</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="simulation.html">
+                                    <i class="fas fa-play-circle"></i>
+                                    <span>Simulation</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="posttest.html">
+                                    <i class="fas fa-clipboard-check"></i>
+                                    <span>Post Test</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="references.html" class="active">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>References</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
+                </div>
 
-                    <!-- Content -->
-                    <div class="content-card">
-                        <h2 class="section-title"><i class="fas fa-clipboard-question me-2"></i>Pre Test</h2>
-                        
-                        <div id="quiz">
-                            <!-- Question 1 -->
-                            <div class="question">
-                                <div class="question-text">
-                                    <strong>1. Which of the following is NOT a common file allocation strategy?</strong>
-                                </div>
-                                <div class="options">
-                                    <div class="option">
-                                        <input type="radio" name="q1" value="a" id="q1a">
-                                        <label for="q1a">Contiguous Allocation</label>
+                <!-- Content Area -->
+                <div class="col-lg-9">
+                    <div class="content-area fade-in">
+                        <!-- Breadcrumb -->
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb breadcrumb-custom">
+                                <li class="breadcrumb-item">Deadlock Detection Algorithm</li>
+                                <li class="breadcrumb-item active">References</li>
+                            </ol>
+                        </nav>
+
+                        <!-- Page Header -->
+                        <div class="page-header">
+                            <h1 class="page-title">Deadlock Detection Algorithm</h1>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="content-card">
+                            <h2 class="section-title"><i class="fas fa-external-link-alt me-2"></i>References</h2>
+                            
+                            <div class="info-box">
+                                <h4><i class="fas fa-info-circle me-2"></i>Academic Resources</h4>
+                                <p>The following references provide comprehensive coverage of deadlock detection algorithms and operating system concepts used in this virtual lab.</p>
+                            </div>
+
+                            <div class="reference-item">
+                                <div class="d-flex align-items-start">
+                                    <div class="reference-number">1</div>
+                                    <div class="reference-text">
+                                        A. Silberschatz, P. B. Galvin, and G. Gagne, <em>Operating System Concepts</em>, 9<sup>th</sup> ed. Hoboken, NJ: Wiley, 2018.
                                     </div>
-                                    <div class="option">
-                                        <input type="radio" name="q1" value="b" id="q1b">
-                                        <label for="q1b">Linked Allocation</label>
-                                    </div>
-                                    <div class="option">
-                                        <input type="radio" name="q1" value="c" id="q1c">
-                                        <label for="q1c">Indexed Allocation</label>
-                                    </div>
-                                    <div class="option">
-                                        <input type="radio" name="q1" value="d" id="q1d">
-                                        <label for="q1d">Random Allocation</label>
-                                    </div>
-                                </div>
-                                <div id="result-1" class="result" style="display: none;"></div>
-                                <div id="explanation-1" class="explanation" style="display: none;">
-                                    <strong>Explanation:</strong> Random Allocation is not a recognized file allocation strategy. The three main file allocation strategies are Contiguous, Linked, and Indexed allocation. Each has specific methods for organizing file storage on disk.
                                 </div>
                             </div>
 
-                            <!-- Question 2 -->
-                            <div class="question">
-                                <div class="question-text">
-                                    <strong>2. In the contiguous file allocation strategy, files are stored:</strong>
-                                </div>
-                                <div class="options">
-                                    <div class="option">
-                                        <input type="radio" name="q2" value="a" id="q2a">
-                                        <label for="q2a">In scattered blocks throughout the disk</label>
+                            <div class="reference-item">
+                                <div class="d-flex align-items-start">
+                                    <div class="reference-number">2</div>
+                                    <div class="reference-text">
+                                        H. M. Deitel, P. J. Deitel, and D. R. Choffnes, <em>Operating Systems</em>, 3<sup>rd</sup> ed. Upper Saddle River, NJ: Prentice Hall, 2003.
                                     </div>
-                                    <div class="option">
-                                        <input type="radio" name="q2" value="b" id="q2b">
-                                        <label for="q2b">In a linked list of disk blocks</label>
-                                    </div>
-                                    <div class="option">
-                                        <input type="radio" name="q2" value="c" id="q2c">
-                                        <label for="q2c">In a series of contiguous disk blocks</label>
-                                    </div>
-                                    <div class="option">
-                                        <input type="radio" name="q2" value="d" id="q2d">
-                                        <label for="q2d">Using an index table of block addresses</label>
-                                    </div>
-                                </div>
-                                <div id="result-2" class="result" style="display: none;"></div>
-                                <div id="explanation-2" class="explanation" style="display: none;">
-                                    <strong>Explanation:</strong> Contiguous allocation stores files in consecutive disk blocks. This provides fast sequential access and minimal seek time, but can lead to external fragmentation and requires knowing file size in advance.
                                 </div>
                             </div>
 
-                            <!-- Question 3 -->
-                            <div class="question">
-                                <div class="question-text">
-                                    <strong>3. In linked allocation, each file consists of:</strong>
-                                </div>
-                                <div class="options">
-                                    <div class="option">
-                                        <input type="radio" name="q3" value="a" id="q3a">
-                                        <label for="q3a">A contiguous set of blocks</label>
+                            <div class="reference-item">
+                                <div class="d-flex align-items-start">
+                                    <div class="reference-number">3</div>
+                                    <div class="reference-text">
+                                        W. Stallings, <em>Operating Systems: Internals and Design Principles</em>, 8<sup>th</sup> ed. Boston, MA: Pearson, 2014.
                                     </div>
-                                    <div class="option">
-                                        <input type="radio" name="q3" value="b" id="q3b">
-                                        <label for="q3b">A linked list of disk blocks</label>
-                                    </div>
-                                    <div class="option">
-                                        <input type="radio" name="q3" value="c" id="q3c">
-                                        <label for="q3c">An indexed set of block pointers</label>
-                                    </div>
-                                    <div class="option">
-                                        <input type="radio" name="q3" value="d" id="q3d">
-                                        <label for="q3d">A single disk block</label>
-                                    </div>
-                                </div>
-                                <div id="result-3" class="result" style="display: none;"></div>
-                                <div id="explanation-3" class="explanation" style="display: none;">
-                                    <strong>Explanation:</strong> Linked allocation uses a linked list structure where each block contains a pointer to the next block. This eliminates external fragmentation but makes random access slower and requires extra space for pointers.
                                 </div>
                             </div>
 
-                            <!-- Question 4 -->
-                            <div class="question">
-                                <div class="question-text">
-                                    <strong>4. Which file allocation strategy can suffer from external fragmentation?</strong>
-                                </div>
-                                <div class="options">
-                                    <div class="option">
-                                        <input type="radio" name="q4" value="a" id="q4a">
-                                        <label for="q4a">Contiguous Allocation</label>
+                            <div class="reference-item">
+                                <div class="d-flex align-items-start">
+                                    <div class="reference-number">4</div>
+                                    <div class="reference-text">
+                                        A. S. Tanenbaum and H. Bos, <em>Modern Operating Systems</em>, 4<sup>th</sup> ed. Boston, MA: Pearson, 2014.
                                     </div>
-                                    <div class="option">
-                                        <input type="radio" name="q4" value="b" id="q4b">
-                                        <label for="q4b">Linked Allocation</label>
-                                    </div>
-                                    <div class="option">
-                                        <input type="radio" name="q4" value="c" id="q4c">
-                                        <label for="q4c">Indexed Allocation</label>
-                                    </div>
-                                    <div class="option">
-                                        <input type="radio" name="q4" value="d" id="q4d">
-                                        <label for="q4d">All of the above</label>
-                                    </div>
-                                </div>
-                                <div id="result-4" class="result" style="display: none;"></div>
-                                <div id="explanation-4" class="explanation" style="display: none;">
-                                    <strong>Explanation:</strong> Contiguous allocation suffers from external fragmentation because it requires consecutive free blocks. When files are deleted, gaps are created that may be too small for new files, leading to wasted space.
                                 </div>
                             </div>
 
-                            <!-- Question 5 -->
-                            <div class="question">
-                                <div class="question-text">
-                                    <strong>5. Indexed allocation is especially advantageous for:</strong>
-                                </div>
-                                <div class="options">
-                                    <div class="option">
-                                        <input type="radio" name="q5" value="a" id="q5a">
-                                        <label for="q5a">Small files with frequent extensions</label>
+                            <div class="reference-item">
+                                <div class="d-flex align-items-start">
+                                    <div class="reference-number">5</div>
+                                    <div class="reference-text">
+                                        E. W. Dijkstra, "The Banker's Algorithm," in <em>Communications of the ACM</em>, vol. 11, no. 3, pp. 147-148, March 1968.
                                     </div>
-                                    <div class="option">
-                                        <input type="radio" name="q5" value="b" id="q5b">
-                                        <label for="q5b">Large files with random access requirements</label>
-                                    </div>
-                                    <div class="option">
-                                        <input type="radio" name="q5" value="c" id="q5c">
-                                        <label for="q5c">Large files with sequential access patterns</label>
-                                    </div>
-                                    <div class="option">
-                                        <input type="radio" name="q5" value="d" id="q5d">
-                                        <label for="q5d">Small files stored contiguously</label>
-                                    </div>
-                                </div>
-                                <div id="result-5" class="result" style="display: none;"></div>
-                                <div id="explanation-5" class="explanation" style="display: none;">
-                                    <strong>Explanation:</strong> Indexed allocation is ideal for large files with random access requirements because the index block allows direct access to any block without traversing a linked list, making random access efficient.
                                 </div>
                             </div>
 
-                            <div class="submit-btn">
-                                <button type="button" class="btn-custom" onclick="checkAnswers()">
-                                    <i class="fas fa-check me-2"></i>SUBMIT
-                                </button>
+                            <div class="info-box mt-4">
+                                <h4><i class="fas fa-lightbulb me-2"></i>Additional Learning Resources</h4>
+                                <p>For further study on deadlock detection and prevention algorithms, students are encouraged to explore research papers on resource allocation graphs, wait-for graphs, and advanced deadlock resolution techniques in distributed systems.</p>
                             </div>
-
-                            <div id="final-result" class="final-result" style="display: none;"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Footer -->
-<footer class="footer-custom">
-    <div class="container">
-        <h4><i class="fas fa-code me-2"></i>Developed by Nar Narayan Gaur</h4>
-    </div>
-</footer>
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="container">
+            <h4><i class="fas fa-code me-2"></i>Developed by Nar Narayan Gaur</h4>
+        </div>
+    </footer>
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    function checkAnswers() {
-        var answers = ['d', 'c', 'b', 'a', 'b'];
-        var totalQuestions = 5;
-        var correctAnswers = 0;
-
-        // Reset all option styles
-        $('.option').removeClass('correct incorrect');
-
-        for (var i = 1; i <= totalQuestions; i++) {
-            var selectedOption = $('input[name=q' + i + ']:checked');
-            var resultElement = $('#result-' + i);
-            var explanationElement = $('#explanation-' + i);
-            var questionOptions = $('input[name=q' + i + ']').parent();
-
-            if (selectedOption.length > 0) {
-                var selectedAnswer = selectedOption.val();
-                var selectedOptionDiv = selectedOption.parent();
-
-                if (selectedAnswer === answers[i - 1]) {
-                    selectedOptionDiv.addClass('correct');
-                    resultElement.removeClass('incorrect').addClass('correct');
-                    resultElement.html('<i class="fas fa-check-circle me-2"></i>Correct!');
-                    correctAnswers++;
-                } else {
-                    selectedOptionDiv.addClass('incorrect');
-                    resultElement.removeClass('correct').addClass('incorrect');
-                    resultElement.html('<i class="fas fa-times-circle me-2"></i>Wrong!');
-                }
-            } else {
-                resultElement.removeClass('correct').addClass('incorrect');
-                resultElement.html('<i class="fas fa-exclamation-circle me-2"></i>No answer selected!');
-            }
-            
-            resultElement.show();
-            explanationElement.show();
-        }
-
-        var finalResult = $('#final-result');
-        var percentage = Math.round((correctAnswers / totalQuestions) * 100);
-        var gradeClass = '';
-        var gradeText = '';
-
-        if (percentage >= 80) {
-            gradeClass = 'grade-excellent';
-            gradeText = 'Excellent!';
-        } else if (percentage >= 60) {
-            gradeClass = 'grade-good';
-            gradeText = 'Good!';
-        } else {
-            gradeClass = 'grade-needs-improvement';
-            gradeText = 'Needs Improvement';
-        }
-
-        finalResult.removeClass('grade-excellent grade-good grade-needs-improvement').addClass(gradeClass);
-        finalResult.html(`
-            <i class="fas fa-chart-bar me-2"></i>
-            ${gradeText} You scored ${correctAnswers} out of ${totalQuestions} questions (${percentage}%)
-        `);
-        finalResult.show();
-
-        // Scroll to results
-        $('html, body').animate({
-            scrollTop: finalResult.offset().top - 100
-        }, 1000);
-    }
-
-    $(document).ready(function() {
-        // Add active class to current page
-        var currentPage = window.location.pathname.split('/').pop();
-        $('.sidebar-menu a').removeClass('active');
-        $('.sidebar-menu a[href="' + currentPage + '"]').addClass('active');
-    });
-</script>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Add active class to current page
+            var currentPage = window.location.pathname.split('/').pop();
+            $('.sidebar-menu a').removeClass('active');
+            $('.sidebar-menu a[href="' + currentPage + '"]').addClass('active');
+        });
+    </script>
 </body>
 </html>
